@@ -11,3 +11,4 @@ export * from './company.controller';
 export * from './employee.controller';
 export * from './client.controller';
 export * from './product.controller';
+export * from './sale.controller';
