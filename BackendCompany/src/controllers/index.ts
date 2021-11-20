@@ -16,3 +16,5 @@ export * from './company-client.controller';
 export * from './client-company.controller';
 export * from './sale-product.controller';
 export * from './product-sale.controller';
+export * from './message-employee-employee.controller';
+export * from './employee-message-employee.controller';

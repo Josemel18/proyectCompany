@@ -5,3 +5,4 @@ export * from './product.repository';
 export * from './sale.repository';
 export * from './client-company.repository';
 export * from './sale-product.repository';
+export * from './message-employee.repository';
