@@ -1,30 +1,30 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {MessageEmployee} from '../models';
-import {MessageEmployeeRepository} from '../repositories';
+import {EmployeeRepository, MessageEmployeeRepository} from '../repositories';
+import {NotificationService} from '../services';
 
 export class MessageEnployeeController {
   constructor(
     @repository(MessageEmployeeRepository)
-    public messageEmployeeRepository : MessageEmployeeRepository,
-  ) {}
+    public messageEmployeeRepository: MessageEmployeeRepository,
+    @repository(EmployeeRepository)
+    public employeeRepository: EmployeeRepository,
+    @service(NotificationService)
+    public notification: NotificationService
+  ) { }
 
   @post('/message-employees')
   @response(200, {
@@ -44,7 +44,22 @@ export class MessageEnployeeController {
     })
     messageEmployee: Omit<MessageEmployee, 'id'>,
   ): Promise<MessageEmployee> {
-    return this.messageEmployeeRepository.create(messageEmployee);
+
+    let employee = this.employeeRepository.findById(messageEmployee.employeeId)
+    if (employee) {
+      let phone: string = (await employee).phone;
+
+      console.log("El empleado con id " + messageEmployee.employeeId + " fue encontrado.")
+      console.log("El telefono del empleado " + (await employee).name + " " + (await employee).lastname + " es " + phone)
+
+      this.notification.SendNotificationBySms(phone, messageEmployee.message);
+      return this.messageEmployeeRepository.create(messageEmployee);
+
+    } else {
+      console.log("el id " + messageEmployee.employeeId + " no existe en la base de datos, el mensaje no fue enviado")
+      return messageEmployee;
+    }
+
   }
 
   @get('/message-employees/count')
